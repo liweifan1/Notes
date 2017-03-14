@@ -49,3 +49,12 @@ C:\Users\lenovo\Desktop\c#\c#\资源管理器\资源管理器\obj\Debug\资源�
 F:\phpstrom\资源管理器\资源管理器\bin\Debug\资源管理器.exe.config
 F:\phpstrom\资源管理器\资源管理器\obj\Debug\资源管理器.exe
 F:\phpstrom\资源管理器\资源管理器\obj\Debug\资源管理器.pdb
+F:\git本地库\Notes\资源管理器\bin\Debug\资源管理器.exe.config
+F:\git本地库\Notes\资源管理器\bin\Debug\资源管理器.exe
+F:\git本地库\Notes\资源管理器\bin\Debug\资源管理器.pdb
+F:\git本地库\Notes\资源管理器\obj\Debug\资源管理器.csprojResolveAssemblyReference.cache
+F:\git本地库\Notes\资源管理器\obj\Debug\资源管理器.Form4.resources
+F:\git本地库\Notes\资源管理器\obj\Debug\资源管理器.Properties.Resources.resources
+F:\git本地库\Notes\资源管理器\obj\Debug\资源管理器.csproj.GenerateResource.Cache
+F:\git本地库\Notes\资源管理器\obj\Debug\资源管理器.exe
+F:\git本地库\Notes\资源管理器\obj\Debug\资源管理器.pdb

@@ -9,24 +9,18 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Net.Sockets;
+using System.Data.SqlClient;
 
 namespace 资源管理器
 {
     public partial class Form4 : Form
     {
+        ConstantList constant = new ConstantList();
+
+
         public Form4()
         {
             InitializeComponent();
-        }
-        private class IconIndexes
-        {
-            public const int MyComputer = 2;      //我的电脑
-            public const int ClosedFolder = 1;    //文件夹关闭
-            public const int OpenFolder = 0;      //文件夹打开
-            //public const int FixedDrive = 3;      //磁盘盘符
-            public const int MyDocuments = 1;     //我的文档
-            public const int recycle = 4;
-            //public const int
         }
         private void toolStripSeparator1_Click(object sender, EventArgs e)
         {
@@ -67,7 +61,7 @@ namespace 资源管理器
             {
                 //实例化TreeNode类 TreeNode(string text,int imageIndex,int selectImageIndex)            
                 TreeNode rootNode = new TreeNode("我的电脑",
-                IconIndexes.MyComputer, IconIndexes.MyComputer);  //载入显示 选择显示
+                ConstantList.MyComputer, ConstantList.MyComputer);  //载入显示 选择显示
                 rootNode.Tag = "我的电脑";                            //树节点数据
                 rootNode.Text = "我的电脑";                           //树节点标签内容
                 e.Node.Nodes.Add(rootNode);
@@ -79,41 +73,41 @@ namespace 资源管理器
                 TreeNode DocNode = new TreeNode(myDocuments);
                 DocNode.Tag = "我的文档";                            //设置结点名称
                 DocNode.Text = "我的文档";
-                DocNode.ImageIndex = IconIndexes.MyDocuments;         //设置获取结点显示图片
-                DocNode.SelectedImageIndex = IconIndexes.MyDocuments; //设置选择显示图片
+                DocNode.ImageIndex = ConstantList.MyDocuments;         //设置获取结点显示图片
+                DocNode.SelectedImageIndex = ConstantList.MyDocuments; //设置选择显示图片
                 e.Node.Nodes.Add(DocNode);                          //rootNode目录下加载
             }
             /*TreeNode reNode = new TreeNode("回收站",
-           IconIndexes.MyComputer, IconIndexes.MyComputer);  //载入显示 选择显示
+           ConstantList.MyComputer, ConstantList.MyComputer);  //载入显示 选择显示
             reNode.Tag = "回收站";                            //树节点数据
             reNode.Text = "回收站";                           //树节点标签内容
-            DocNode.ImageIndex = IconIndexes.recycle;         //设置获取结点显示图片
-            DocNode.SelectedImageIndex = IconIndexes.recycle; //设置选择显示图片
+            DocNode.ImageIndex = ConstantList.recycle;         //设置获取结点显示图片
+            DocNode.SelectedImageIndex = ConstantList.recycle; //设置选择显示图片
             e.Node.Nodes.Add(reNode);*/
 
-            string path;
+            
             if (e.Node.Tag.ToString() == "桌面")
             {
-                path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);  //获取桌面地址 
+               constant.path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);  //获取桌面地址 
             }
             else
             {
-                path = e.Node.Tag.ToString();
+                constant.path = e.Node.Tag.ToString();
             }
-            string[] dics = Directory.GetDirectories(path);
+            string[] dics = Directory.GetDirectories(constant.path);
             foreach (string dic in dics)
             {
                 TreeNode subNode = new TreeNode(new DirectoryInfo(dic).Name); //实例化
                 subNode.Name = new DirectoryInfo(dic).FullName;               //完整目录
                 subNode.Tag = subNode.Name;
-                //subNode.ImageIndex = IconIndexes.ClosedFolder;       //获取节点显示图片
-                subNode.SelectedImageIndex = IconIndexes.OpenFolder; //选择节点显示图片
+                //subNode.ImageIndex = ConstantList.ClosedFolder;       //获取节点显示图片
+                subNode.SelectedImageIndex = ConstantList.OpenFolder; //选择节点显示图片
 
                 e.Node.Nodes.Add(subNode);
                 subNode.Nodes.Add("");   //加载空节点 实现+号
 
             }
-            DirectoryInfo dir = new DirectoryInfo(path);//实例目录与子目录
+            DirectoryInfo dir = new DirectoryInfo(constant.path);//实例目录与子目录
             FileInfo[] fileInfo = dir.GetFiles();//获取当前目录文件列表
             long length;
             for (int i = 0; i < fileInfo.Length; i++)
@@ -267,7 +261,88 @@ namespace 资源管理器
             button1.Visible = false;
             listView1.Dock = DockStyle.Fill;
         }
-        
 
+        private void 同步ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void CheckAddress(SqlConnection conn,SqlCommand cmd)
+        {
+            try
+            {
+                conn.Open();
+                constant.schemaInformation = conn.GetSchema("Tables",constant.restrictionValues);
+
+                foreach (DataRow row in constant.schemaInformation.Rows)
+                {
+                    constant.tablenames.Add(row.ItemArray[2].ToString());
+                }
+            }
+            finally
+            {
+                constant.conLocation.Close();
+            }
+        }
+
+        private void 同步到本地ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            #region 连接到数据库
+            //先打开两个类库文件
+           
+
+            // con.ConnectionString = "server=505-03;database=ttt;user=sa;pwd=123";
+            constant.conLocation.ConnectionString = "server=.;database=Cloud_Location;uid=sa;pwd=knxy0616";
+            constant.conLocation.Open();
+            constant.conLocation.GetSchema();
+            /*
+            SqlDataAdapter 对象。 用于填充DataSet （数据集）。
+            SqlDataReader 对象。 从数据库中读取流..
+            后面要做增删改查还需要用到 DataSet 对象。
+            */
+            constant.comLocation.Connection = constant.conLocation;
+            constant.comLocation.CommandType = CommandType.Text;
+            constant.comLocation.CommandText = "USE Cloud_Location;SELECT * FROM FileInfo";
+
+            constant.dr = constant.comLocation.ExecuteReader();//执行SQL语句
+         
+            constant.dr.Close();//关闭执行
+            constant.conLocation.Close();//关闭数据库
+
+            #endregion
+
+
+
+        }
+
+        private void listView1_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripLabel3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripButton4_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.InitialDirectory = "c:\\";//注意这里写路径时要用c:\\而不是c:\
+            openFileDialog1.Filter = "文本文件|*.*|C#文件|*.cs|所有文件|*.*";
+            openFileDialog1.RestoreDirectory = true;
+            openFileDialog1.FilterIndex = 1;
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                constant.SearhPathFileName = openFileDialog1.FileName;
+                constant.SearchFileName = true;
+            }
+        }
+
+        private void toolStripButton6_Click(object sender, EventArgs e)
+        {
+            constant.ToFilePath = toolStripComboBox1.Text;
+
+        }
     }
 }

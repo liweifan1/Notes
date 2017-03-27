@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncTCPClient.cs" />
+    <Compile Include="ConstantList.cs" />
     <Compile Include="Form4.cs">
       <SubType>Form</SubType>
     </Compile>
